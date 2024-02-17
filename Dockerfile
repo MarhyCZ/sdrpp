@@ -26,11 +26,21 @@ RUN git clone https://github.com/airspy/airspyone_host.git
 WORKDIR /src/airspyone_host
 RUN mkdir build && cd build && cmake ../ -DINSTALL_UDEV_RULES=ON && make -j`nproc` && make install -j`nproc` && ldconfig
 
+# Airspy HF+ Driver
+WORKDIR /src/
+RUN git clone https://github.com/airspy/airspyhf.git
+WORKDIR /src/airspyhf
+RUN mkdir build && cd build && cmake ../ -DINSTALL_UDEV_RULES=ON && make -j`nproc` && make install -j`nproc` && ldconfig
+
 # SDR++
 WORKDIR /src/
 RUN git clone https://github.com/AlexandreRouma/SDRPlusPlus.git
 WORKDIR /src/SDRPlusPlus
-RUN mkdir build && cd build && cmake ../ -DOPT_BUILD_AIRSPYHF_SOURCE=OFF -DOPT_BUILD_HACKRF_SOURCE=OFF -DOPT_BUILD_HERMES_SOURCE=OFF -DOPT_BUILD_PLUTOSDR_SOURCE=OFF -DOPT_BUILD_RFSPACE_SOURCE=OFF -DOPT_BUILD_RTL_SDR_SOURCE=OFF -DOPT_BUILD_SOAPY_SOURCE=OFF -DOPT_BUILD_SPECTRAN_SOURCE=OFF && make -j`nproc` && make install -j`nproc` && ldconfig
+RUN mkdir build && cd build && cmake ../ \
+  -DOPT_BUILD_AIRSPYHF_SOURCE=ON -DOPT_BUILD_HACKRF_SOURCE=OFF \
+  -DOPT_BUILD_HERMES_SOURCE=OFF -DOPT_BUILD_PLUTOSDR_SOURCE=OFF \
+  -DOPT_BUILD_RFSPACE_SOURCE=OFF -DOPT_BUILD_RTL_SDR_SOURCE=OFF \
+  -DOPT_BUILD_SOAPY_SOURCE=OFF -DOPT_BUILD_SPECTRAN_SOURCE=OFF && make -j`nproc` && make install -j`nproc` && ldconfig
 RUN which sdrpp
 
 FROM debian:bookworm-slim AS runtime
